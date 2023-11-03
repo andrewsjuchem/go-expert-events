@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -35,16 +36,17 @@ type EventHandler struct {
 }
 
 func (h *EventHandler) Handle(event events.EventInterface, wg *sync.WaitGroup) {
+	fmt.Println(h.message)
+	wg.Done()
 }
 
 func main() {
-
 	var eventDispatcher = events.NewEventDispatcher()
 	var applyDiscountHandler = EventHandler{message: "A discount has been applied."}
 	var calculateOrderHandler = EventHandler{message: "Order has been calculated."}
 	var confirmPaymentHandler = EventHandler{message: "Payment has been confirmed."}
 
-	var createOrderEvent = Event{Name: "create order", Payload: EventPayload{ID: 1, Price: 60, Discount: 10}}
+	var createOrderEvent = Event{Name: "Create order", Payload: EventPayload{ID: 1, Price: 60, Discount: 10}}
 
 	err := eventDispatcher.Register(createOrderEvent.GetName(), &applyDiscountHandler)
 	if err != nil {
@@ -61,4 +63,13 @@ func main() {
 		panic(err)
 	}
 
+	fmt.Println("*** FIRST ORDER ***")
+	eventDispatcher.Dispatch(&createOrderEvent)
+
+	fmt.Println("*** SECOND ORDER ***")
+	err = eventDispatcher.Remove(createOrderEvent.GetName(), &confirmPaymentHandler)
+	if err != nil {
+		panic(err)
+	}
+	eventDispatcher.Dispatch(&createOrderEvent)
 }

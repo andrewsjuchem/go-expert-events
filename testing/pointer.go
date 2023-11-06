@@ -1,51 +1,9 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"sync"
 )
 
-// ---------------
-type EventHandlerInterface interface {
-	Handle(event EventInterface, wg *sync.WaitGroup)
-}
-
-type EventDispatcher struct {
-	handlers map[string][]EventHandlerInterface
-}
-
-func NewEventDispatcher() *EventDispatcher {
-	return &EventDispatcher{
-		handlers: make(map[string][]EventHandlerInterface),
-	}
-}
-
-func (ed *EventDispatcher) Register(eventName string, handler EventHandlerInterface) error {
-	if _, ok := ed.handlers[eventName]; ok {
-		for _, h := range ed.handlers[eventName] {
-			if h == handler {
-				return errors.New("handler already registered")
-			}
-		}
-	}
-	ed.handlers[eventName] = append(ed.handlers[eventName], handler)
-	return nil
-}
-
-func (ev *EventDispatcher) Dispatch(event EventInterface) error {
-	if handlers, ok := ev.handlers[event.GetName()]; ok {
-		wg := &sync.WaitGroup{}
-		for _, handler := range handlers {
-			wg.Add(1)
-			go handler.Handle(event, wg)
-		}
-		wg.Wait()
-	}
-	return nil
-}
-
-// ---------------
 type EventInterface interface {
 	GetName() string
 }
@@ -58,28 +16,19 @@ func (e *Event) GetName() string {
 	return e.Name
 }
 
-// ---------------
-type EventHandler struct {
-	message string
+func Dispatch(event EventInterface) error {
+	fmt.Println(event.GetName())
+	return nil
 }
-
-func (h *EventHandler) Handle(event EventInterface, wg *sync.WaitGroup) {
-	fmt.Println(h.message)
-	wg.Done()
-}
-
-// ---------------
 
 func main() {
-	var eventDispatcher = NewEventDispatcher()
-	var applyDiscountHandler = EventHandler{message: "A discount has been applied."}
 	var createOrderEvent = Event{Name: "Create order"}
-
-	err := eventDispatcher.Register(createOrderEvent.GetName(), &applyDiscountHandler)
-	if err != nil {
-		panic(err)
-	}
-
 	fmt.Println("*** FIRST ORDER ***")
-	eventDispatcher.Dispatch(&createOrderEvent)
+	/*
+		The createOrderEvent variable is passed as a pointer to the Dispatch function because of the way the EventInterface is implemented.
+		When defining an interface in Go, the methods that make up the interface can be implemented using either value receivers or pointer receivers.
+		In this instance, the GetName method of the Event struct is implemented with a pointer receiver (e *Event),
+		which means that only pointers to Event instances can be used as EventInterface.
+	*/
+	Dispatch(&createOrderEvent)
 }

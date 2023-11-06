@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-	"time"
 )
 
 // ---------------
@@ -49,7 +48,6 @@ func (ev *EventDispatcher) Dispatch(event EventInterface) error {
 // ---------------
 type EventInterface interface {
 	GetName() string
-	GetDateTime() time.Time
 }
 
 type Event struct {
@@ -58,10 +56,6 @@ type Event struct {
 
 func (e *Event) GetName() string {
 	return e.Name
-}
-
-func (e *Event) GetDateTime() time.Time {
-	return time.Now()
 }
 
 // ---------------

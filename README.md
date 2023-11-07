@@ -1,4 +1,4 @@
-# Go Expert - Event Dispatch + RabbitMQ
+# Go Expert - Event Dispatcher + RabbitMQ
 
 RabbitMQ - Starting up container
 ```

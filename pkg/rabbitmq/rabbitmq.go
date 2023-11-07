@@ -5,17 +5,21 @@ import (
 )
 
 func OpenChannel() (*amqp.Channel, error) {
-	// Create connection to RabbitMQ
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	amqpServerURL := "amqp://guest:guest@localhost:5672/"
+	connectRabbitMQ, err := amqp.Dial(amqpServerURL)
 	if err != nil {
 		panic(err)
 	}
-	// defer conn.Close()
+	// defer connectRabbitMQ.Close() // it is closed by the caller
 
-	// Create RabbitMQ channel (this is not a regular Go channel)
-	ch, err := conn.Channel()
+	channelRabbitMQ, err := connectRabbitMQ.Channel()
+	if err != nil {
+		panic(err)
+	}
+	// defer channelRabbitMQ.Close() // it is closed by the caller
+
 	// Limits the number of messages that can be processed at the same time
-	ch.Qos(
+	channelRabbitMQ.Qos(
 		100,   // prefetch count
 		0,     // prefetch size
 		false, // global
@@ -23,15 +27,13 @@ func OpenChannel() (*amqp.Channel, error) {
 	if err != nil {
 		panic(err)
 	}
-	// defer ch.Close()
-	return ch, nil
-
+	return channelRabbitMQ, nil
 }
 
-func Consume(ch *amqp.Channel, out chan<- amqp.Delivery, queue string) error {
+func Consume(ch *amqp.Channel, out chan<- amqp.Delivery, queueName string) error {
 	// Consumes messages from RabbitMQ
 	msg, err := ch.Consume(
-		queue,         // queue
+		queueName,     // queue
 		"go-consumer", // consumer
 		false,         // auto-ack
 		false,         // exclusive
@@ -49,16 +51,17 @@ func Consume(ch *amqp.Channel, out chan<- amqp.Delivery, queue string) error {
 	return nil
 }
 
-func Publish(ch *amqp.Channel, body string, exName string) error {
+func Publish(ch *amqp.Channel, body string, exName string, queueName string) error {
+	message := amqp.Publishing{
+		ContentType: "text/plain",
+		Body:        []byte(body),
+	}
 	err := ch.Publish(
-		"amq.direct",
-		"",
+		exName,
+		queueName,
 		false,
 		false,
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(body),
-		},
+		message,
 	)
 	if err != nil {
 		return err

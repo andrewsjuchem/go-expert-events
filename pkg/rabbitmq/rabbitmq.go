@@ -1,6 +1,8 @@
 package rabbitmq
 
 import (
+	"context"
+
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -56,7 +58,9 @@ func Publish(ch *amqp.Channel, body string, exName string, queueName string) err
 		ContentType: "text/plain",
 		Body:        []byte(body),
 	}
-	err := ch.Publish(
+	ctx := context.Background()
+	err := ch.PublishWithContext(
+		ctx,
 		exName,
 		queueName,
 		false,

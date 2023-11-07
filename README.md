@@ -20,7 +20,7 @@ RabbitMQ - Producer
 go run cmd/producer/main.go 
 ```
 
-Event Dispacter - Testing
+Event Dispatcher - Testing (unrelated to RabbitMQ)
 ```
 go run cmd/event_dispatcher/main.go 
 ```

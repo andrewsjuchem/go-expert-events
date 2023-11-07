@@ -14,9 +14,8 @@ func main() {
 	}
 	defer ch.Close()
 
-	msgs := make(chan amqp.Delivery)
-
-	go rabbitmq.Consume(ch, msgs, "orders")
+	msgs := make(chan amqp.Delivery)        // Create a Go channel to receive messages from RabbitMQ
+	go rabbitmq.Consume(ch, msgs, "orders") // Keeps consuming message from RabbitMQ and puts them into the Go channel
 
 	for msg := range msgs {
 		fmt.Println(string(msg.Body))

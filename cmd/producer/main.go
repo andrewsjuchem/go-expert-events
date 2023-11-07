@@ -1,6 +1,8 @@
 package main
 
-import "github.com/andrewsjuchem/go-expert-events/pkg/rabbitmq"
+import (
+	"github.com/andrewsjuchem/go-expert-events/pkg/rabbitmq"
+)
 
 func main() {
 	// Create RabbitMQ channel (this is not a regular Go channel)
@@ -10,7 +12,10 @@ func main() {
 	}
 	defer ch.Close()
 
-	rabbitmq.Publish(ch, "Hello World!", "amq.direct")
+	err = rabbitmq.Publish(ch, "Hello World!", "amq.direct")
+	if err != nil {
+		panic(err)
+	}
 
 	// for i := 0; i < 10000000; i++ {
 	// 	order := GenerateOrders()

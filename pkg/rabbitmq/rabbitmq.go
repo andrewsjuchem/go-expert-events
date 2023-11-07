@@ -1,14 +1,12 @@
 package rabbitmq
 
 import (
-	"context"
-
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func OpenChannel() (*amqp.Channel, error) {
 	// Create connection to RabbitMQ
-	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
+	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	if err != nil {
 		panic(err)
 	}
@@ -52,10 +50,8 @@ func Consume(ch *amqp.Channel, out chan<- amqp.Delivery, queue string) error {
 }
 
 func Publish(ch *amqp.Channel, body string, exName string) error {
-	ctx := context.Background()
-	err := ch.PublishWithContext(
-		ctx,
-		exName,
+	err := ch.Publish(
+		"amq.direct",
 		"",
 		false,
 		false,

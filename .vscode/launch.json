@@ -12,6 +12,24 @@
       "cwd": "${workspaceFolder}",
       "program": "./cmd/event_dispatcher/main.go",
       "console": "internalConsole"
+    },
+    {
+      "name": "Launch Consumer",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "cwd": "${workspaceFolder}",
+      "program": "./cmd/consumer/main.go",
+      "console": "internalConsole"
+    },
+    {
+      "name": "Launch Producer",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "cwd": "${workspaceFolder}",
+      "program": "./cmd/producer/main.go",
+      "console": "internalConsole"
     }
   ]
 }

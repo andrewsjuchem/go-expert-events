@@ -5,6 +5,11 @@ RabbitMQ - Starting up container
 docker-compose up -d --build
 ```
 
+RabbitMQ - Creating Queue
+```
+http://localhost:15672/
+```
+
 RabbitMQ - Consumer
 ```
 go run cmd/consumer/main.go 
